@@ -1,12 +1,32 @@
 repo_name: borja-munoz/advent-of-code
-report_id: 0a32d87f5bc6ecdde1f899cbef883f20
+report_id: 942e162c11a1d92c980a2d1fa717267d
 repo_type: Public
-timestamp: '2023-12-07T21:36:11+00:00'
+timestamp: '2023-12-14T10:18:19+00:00'
 requested_by: borja-munoz
 provider: github
 branch: main
-detected_tools_count: 1
+detected_tools_count: 4
 tools:
+- name: Rust
+  description: A safe, concurrent, practical language
+  website_url: http://www.rust-lang.org/
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/1070/v7txhrjp9pdqrkdtxxp0.png
+  detection_source: Repo Metadata
+- name: pgvector
+  description: Open-source vector similarity search for Postgres
+  website_url: https://github.com/pgvector/pgvector/
+  open_source: false
+  hosted_saas: false
+  category: Data Stores
+  sub_category: Database Tools
+  image_url: https://img.stackshare.io/service/109221/default_b888cdf5617d936aa6aacf130911906955508639.png
+  detection_source: 2023/day-01/part-1/input.txt
+  last_updated_by: Borja Muñoz
+  last_updated_on: 2023-12-07 22:47:08.000000000 Z
 - name: Git
   description: Fast, scalable, distributed revision control system
   website_url: http://git-scm.com/
@@ -16,3 +36,14 @@ tools:
   sub_category: Version Control System
   image_url: https://img.stackshare.io/service/1046/git.png
   detection_source: Repo Metadata
+- name: LangChain
+  description: Build AI apps with LLMs through composability
+  website_url: https://github.com/hwchase17/langchain
+  open_source: true
+  hosted_saas: false
+  category: Communications
+  sub_category: Large Language Model Tools
+  image_url: https://img.stackshare.io/service/48790/default_5b6c6b73f1ff3775c85d2a1ba954cb87e30cbf13.jpg
+  detection_source: 2023/day-01/part-1/input.txt
+  last_updated_by: Borja Muñoz
+  last_updated_on: 2023-12-07 22:47:08.000000000 Z
