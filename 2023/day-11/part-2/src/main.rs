@@ -7,52 +7,37 @@ struct Coordinate {
     y: usize
 }
 
-fn expand_universe(universe: Vec<&str>, factor: usize) -> Vec<String> {
-    let mut row_expanded_universe: Vec<&str> = vec![];
-    let mut expanded_universe: Vec<String> = vec![];
+fn get_empty_rows(universe: Vec<&str>) -> Vec<usize> {
+    let mut empty_rows: Vec<usize> = vec![];
 
-    for row in universe {
-        row_expanded_universe.push(row);
-        expanded_universe.push(row.to_string());
-        let galaxy_found = row.find('#');
-        if galaxy_found == None {
-            for _ in 0..factor - 1 {
-                row_expanded_universe.push(row);
-                expanded_universe.push(row.to_string());
-            }
+    for (pos, row) in universe.iter().enumerate() {
+        if row.find('#') == None {
+            empty_rows.push(pos);
         }
-    }
+    } 
 
-    let mut empty_columns = 0;
-    for column in 0..row_expanded_universe[0].len() {
+    return empty_rows;
+}
+
+fn get_empty_columns(universe: Vec<&str>) -> Vec<usize> {
+    let mut empty_columns: Vec<usize> = vec![];
+
+    for column in 0..universe[0].len() {
         let mut galaxy_found = false;
-        for row in &row_expanded_universe {
+        for row in universe.iter() {
             if row.chars().nth(column).unwrap() == '#' {
                 galaxy_found = true;
                 break;
             }
         }
         if !galaxy_found {
-            // println!("No galaxy found for column {}, expanding...", column);
-            let mut index_row = 0;
-            while index_row < row_expanded_universe.len() {
-                for _ in 0..factor - 1 {
-                    expanded_universe[index_row].insert(column + empty_columns, '.');
-                }
-                index_row += 1;
-            }
-            empty_columns += factor - 1;
+            empty_columns.push(column);
         }
     }
-
-    // for row in &expanded_universe {
-    //     println!("{}", row);
-    // }
-
-    return expanded_universe;
+    return empty_columns;
 }
 
-fn get_galaxy_locations(universe: Vec<String>) -> Vec<Coordinate> {
+fn get_galaxy_locations(universe: Vec<&str>) -> Vec<Coordinate> {
     let mut galaxy_locations: Vec<Coordinate> = vec![];
 
     let mut index_row = 0;
@@ -75,7 +60,11 @@ fn get_galaxy_locations(universe: Vec<String>) -> Vec<Coordinate> {
     return galaxy_locations;
 }
 
-fn get_shortest_path(location_a: &Coordinate, location_b: &Coordinate) -> usize {
+fn get_shortest_path(location_a: &Coordinate, 
+                     location_b: &Coordinate,
+                     empty_rows: &Vec<usize>,
+                     empty_columns: &Vec<usize>,
+                     factor: usize) -> usize {
     let diff_x = if location_a.x > location_b.x {
         location_a.x - location_b.x
     } else {
@@ -86,7 +75,37 @@ fn get_shortest_path(location_a: &Coordinate, location_b: &Coordinate) -> usize 
     } else {
         location_b.y - location_a.y
     };
-    return diff_x + diff_y;
+
+    // Calculate if there are empty rows between the locations
+    let mut empty_rows_in_between = 0;
+    let range = if location_a.y < location_b.y { 
+        location_a.y..location_b.y
+    } else { 
+        location_b.y..location_a.y
+    };
+    for row in empty_rows {
+        if range.contains(&row) {
+            empty_rows_in_between += 1;
+        }
+    }
+
+    // Calculate if there are empty columns between the locations
+    let mut empty_columns_in_between = 0;
+    let range = if location_a.x < location_b.x { 
+        location_a.x..location_b.x
+    } else { 
+        location_b.x..location_a.x 
+    };
+    for column in empty_columns {
+        if range.contains(&column) {
+            empty_columns_in_between += 1;
+        }
+    }
+    
+    // println!("Location A: {:?}, Location B: {:?}", location_a, location_b);
+    // println!("Empty rows: {}, Empty columns: {}", empty_rows_in_between, empty_columns_in_between);
+    return diff_x + empty_rows_in_between * (factor - 1) +
+           diff_y + empty_columns_in_between * (factor - 1);
 }
 
 fn main() {
@@ -95,12 +114,21 @@ fn main() {
     let binding = fs::read_to_string("input.txt").unwrap();
     let lines: Vec<_> = binding.lines().collect();
 
-    let expanded_universe = expand_universe(lines, 1000000);
-    let galaxy_locations = get_galaxy_locations(expanded_universe);
+    let galaxy_locations = get_galaxy_locations(lines.clone());
+
+    let empty_rows = get_empty_rows(lines.clone());
+    let empty_columns = get_empty_columns(lines.clone());
+
+    // println!("Empty rows: {:?}", empty_rows);
+    // println!("Empty columns: {:?}", empty_columns);
+
     for i in 0..galaxy_locations.len() - 1 {
         for j in i+1..galaxy_locations.len() {
             let shortest_path = get_shortest_path(&galaxy_locations[i], 
-                                                  &galaxy_locations[j]);
+                                                  &galaxy_locations[j],
+                                                  &empty_rows,
+                                                  &empty_columns,
+                                                  1000000);
             // println!("Shortest path between {} and {}: {}", i, j, shortest_path);
             sum_shortest_paths_lengths += shortest_path;
         }
